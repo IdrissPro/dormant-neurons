@@ -1,4 +1,3 @@
-# src/instrumentation/__init__.py
 """
 Instrumentation utilities:
 - Dormancy metrics (activation/gradient based)

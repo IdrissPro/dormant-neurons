@@ -1,4 +1,3 @@
-# src/rl/ppo.py
 from __future__ import annotations
 
 import math
@@ -37,9 +36,9 @@ from src.instrumentation.hooks import (
 from src.redo.recycle import redo_apply_on_sequential_linears
 from src.redo.schedules import ReDoScheduler
 
-# -------------------------
+#    
 # PPO config defaults
-# -------------------------
+#    
 
 @dataclass
 class PPOConfig:
@@ -103,9 +102,9 @@ def load_ppo_config(cfg: DictConfig) -> PPOConfig:
     )
 
 
-# -------------------------
+#    
 # Small utilities
-# -------------------------
+#    
 
 def _maybe_tanh_activation(name: str) -> str:
     # networks.py supports relu/silu/gelu. PPO often uses tanh.
@@ -170,9 +169,9 @@ def explained_variance(y_pred: torch.Tensor, y_true: torch.Tensor) -> float:
     return float((1.0 - torch.var(y_true - y_pred) / (var_y + 1e-8)).item())
 
 
-# -------------------------
+#    
 # Rollout storage
-# -------------------------
+#    
 
 class RolloutBuffer:
     def __init__(self, num_steps: int, num_envs: int, obs_dim: int, action_shape: Tuple[int, ...], device: torch.device):
@@ -248,9 +247,9 @@ class RolloutBuffer:
         }
 
 
-# -------------------------
+#    
 # Instrumentation helpers
-# -------------------------
+#    
 
 @torch.no_grad()
 def build_linear_name_map(model: nn.Module) -> Dict[int, str]:
@@ -580,7 +579,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                 pg["lr"] = lr_now
             logger.log_scalar("charts/lr", lr_now, step=global_env_step)
 
-        # -------- Rollout collection --------
+        #  - Rollout collection  -
         rb._t = 0
         for step in range(ppo_cfg.num_steps):
             global_env_step += num_envs
@@ -649,7 +648,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
         if ppo_cfg.norm_adv:
             b_adv = (b_adv - b_adv.mean()) / (b_adv.std() + 1e-8)
 
-        # -------- PPO optimization --------
+        #  - PPO optimization  -
         inds = np.arange(batch_size)
         approx_kl = 0.0
 
@@ -729,7 +728,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
             if ppo_cfg.target_kl is not None and approx_kl > float(ppo_cfg.target_kl):
                 break
 
-        # -------- Logging PPO losses (once per update) --------
+        #  - Logging PPO losses (once per update)  -
         y_pred = b_values
         y_true = b_returns
         ev = explained_variance(y_pred, y_true)
@@ -742,7 +741,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
         )
         logger.log_scalar("charts/sps", int(global_env_step / (time.time() - start_time)), step=global_env_step)
 
-        # -------- Instrumentation: dormancy + representation --------
+        #  - Instrumentation: dormancy + representation  -
         if instr_enabled and (update % metric_every == 0):
             with torch.no_grad():
                 probe_obs = pick_probe_batch_from_rollout(b_obs, probe_bs)
@@ -833,7 +832,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                         else:
                             logger.log_text(tag, str(v), step=global_env_step)
 
-        # -------- ReDo integration --------
+        #  - ReDo integration  -
         if redo_enabled:
             # Decide which mask to use for recycling:
             # If selection=activation, use most recent activation masks.

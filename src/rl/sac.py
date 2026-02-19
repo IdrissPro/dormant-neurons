@@ -1,5 +1,4 @@
 
-# src/rl/sac.py
 from __future__ import annotations
 
 import time
@@ -22,9 +21,9 @@ from src.redo.recycle import redo_apply_on_sequential_linears
 from src.redo.schedules import ReDoScheduler
 
 
-# -------------------------
+#    
 # Config
-# -------------------------
+#    
 
 @dataclass
 class SACConfig:
@@ -84,9 +83,9 @@ def load_sac_config(cfg: DictConfig) -> SACConfig:
     )
 
 
-# -------------------------
+#    
 # Replay buffer (vector-env aware)
-# -------------------------
+#    
 
 class ReplayBuffer:
     def __init__(self, obs_dim: int, act_dim: int, size: int):
@@ -138,9 +137,9 @@ class ReplayBuffer:
         }
 
 
-# -------------------------
+#    
 # Networks
-# -------------------------
+#    
 
 LOG_STD_MIN = -20
 LOG_STD_MAX = 2
@@ -412,7 +411,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                 else:
                     alpha = torch.tensor(sac_cfg.alpha, device=device)
 
-                # -------- Critic update --------
+                #  - Critic update  -
                 with torch.no_grad():
                     next_a, next_logp = actor.sample(b_next_obs)
                     q1_next = q1_t(b_next_obs, next_a)
@@ -440,7 +439,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
 
                 q_opt.step()
 
-                # -------- Actor update (possibly delayed) --------
+                #  - Actor update (possibly delayed)  -
                 if update_step % sac_cfg.policy_delay == 0:
                     # Freeze critics for actor update
                     for p in q1.parameters():
@@ -470,7 +469,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                 else:
                     actor_loss = torch.tensor(0.0)
 
-                # -------- Alpha autotune --------
+                #  - Alpha autotune  -
                 if sac_cfg.autotune and (update_step % sac_cfg.policy_delay == 0):
                     # logp from actor update batch
                     alpha_loss = -(log_alpha * (logp.detach() + target_entropy)).mean()
@@ -480,7 +479,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                 else:
                     alpha_loss = torch.tensor(0.0)
 
-                # -------- Target update --------
+                #  - Target update  -
                 soft_update(q1, q1_t, sac_cfg.tau)
                 soft_update(q2, q2_t, sac_cfg.tau)
 
@@ -499,7 +498,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                         step=global_step,
                     )
 
-                # -------- Instrumentation: dormancy + repr --------
+                #  - Instrumentation: dormancy + repr  -
                 if do_metrics:
                     with torch.no_grad():
                         # Probe batch: deterministic sample size-limited
@@ -595,7 +594,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                             else:
                                 logger.log_text(tag, str(v), step=global_step)
 
-                # -------- ReDo integration --------
+                #  - ReDo integration  -
                 if redo_enabled:
                     selection = str(redo_cfg.selection).lower()
                     scope = str(redo_cfg.scope).lower()

@@ -1,4 +1,3 @@
-# src/redo/recycle.py
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -9,9 +8,9 @@ import torch.nn as nn
 from torch.nn import init
 
 
-# -----------------------------
+ 
 # Optimizer-state handling
-# -----------------------------
+ 
 
 @torch.no_grad()
 def _zero_adam_moments_rows(adam: torch.optim.Optimizer, param: torch.Tensor, row_idx: torch.Tensor) -> None:
@@ -45,9 +44,9 @@ def _zero_adam_moments_bias(adam: torch.optim.Optimizer, param: torch.Tensor, id
             st[k][idx] = 0.0
 
 
-# -----------------------------
+ 
 # Reinitialization helpers
-# -----------------------------
+ 
 
 @torch.no_grad()
 def _init_rows_like(weight: torch.Tensor, init_mode: str) -> torch.Tensor:
@@ -61,9 +60,9 @@ def _init_rows_like(weight: torch.Tensor, init_mode: str) -> torch.Tensor:
     return tmp
 
 
-# -----------------------------
+ 
 # Core ReDo primitive
-# -----------------------------
+ 
 
 @torch.no_grad()
 def redo_recycle_linear_pair(
@@ -132,9 +131,9 @@ def redo_recycle_linear_pair(
     return int(idx.numel())
 
 
-# -----------------------------
+ 
 # Model-wide wiring
-# -----------------------------
+ 
 
 @dataclass
 class ReDoResult:

@@ -1,6 +1,4 @@
-# src/logging/logger.py
 from __future__ import annotations
-
 import os
 import io
 import json
@@ -74,7 +72,7 @@ class RunLogger:
         self.env_step: int = 0
         self.update_step: int = 0
 
-    # --------- config / text ---------
+    #   config / text  
 
     def log_config(self, cfg: Optional[DictConfig] = None) -> None:
         cfg = cfg or self.cfg
@@ -92,7 +90,7 @@ class RunLogger:
         if self._stdout_enabled:
             print(f"[text] {tag} (step={step})")
 
-    # --------- scalars ---------
+    #   scalars  
 
     def log_scalar(self, tag: str, value: Number, step: Optional[int] = None) -> None:
         step = int(self.env_step if step is None else step)
@@ -137,7 +135,7 @@ class RunLogger:
         if self._stdout_enabled and "charts/episodic_return" in flat:
             print(f"return={flat['charts/episodic_return']:.2f} step={step}")
 
-    # --------- housekeeping ---------
+    #   housekeeping  
 
     def set_env_step(self, env_step: int) -> None:
         self.env_step = int(env_step)
@@ -160,7 +158,7 @@ class RunLogger:
             self._jsonl_fh.close()
             self._jsonl_fh = None
 
-    # --------- internal ---------
+    #   internal  
 
     def _write_jsonl(self, record: Dict[str, Any]) -> None:
         if not self._jsonl_enabled or self._jsonl_fh is None:

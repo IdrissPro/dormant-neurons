@@ -1,4 +1,3 @@
-# src/rl/dqn.py
 from __future__ import annotations
 
 import time
@@ -21,9 +20,9 @@ from src.redo.recycle import redo_apply_on_sequential_linears
 from src.redo.schedules import ReDoScheduler
 
 
-# -------------------------
+#    
 # Config
-# -------------------------
+#    
 
 @dataclass
 class DQNConfig:
@@ -83,9 +82,9 @@ def load_dqn_config(cfg: DictConfig) -> DQNConfig:
     )
 
 
-# -------------------------
+#    
 # Replay buffer (vector-env aware)
-# -------------------------
+#    
 
 class ReplayBuffer:
     def __init__(self, obs_dim: int, size: int):
@@ -137,9 +136,9 @@ class ReplayBuffer:
         }
 
 
-# -------------------------
+#    
 # Network
-# -------------------------
+#    
 
 class DQNNet(nn.Module):
     """
@@ -205,9 +204,9 @@ def _linear_schedule(start: float, end: float, duration: int, t: int) -> float:
     return start + frac * (end - start)
 
 
-# -------------------------
+#    
 # Training
-# -------------------------
+#    
 
 def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, logger: RunLogger) -> None:
     dqn_cfg = load_dqn_config(cfg)
@@ -359,7 +358,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                     logger.log_scalar("charts/epsilon", float(eps_now), step=global_step)
                     logger.log_scalar("charts/sps", int(global_step / (time.time() - start_time + 1e-8)), step=global_step)
 
-                # -------- Instrumentation: dormancy + repr --------
+                #  - Instrumentation: dormancy + repr  -
                 if do_metrics:
                     with torch.no_grad():
                         # Probe batch from replay buffer (deterministic: sample once)
@@ -417,7 +416,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                             else:
                                 logger.log_text(k, str(v), step=global_step)
 
-                # -------- ReDo integration --------
+                #  - ReDo integration  -
                 if redo_enabled:
                     selection = str(redo_cfg.selection).lower()
                     masks = prev_act_masks if selection == "activation" else prev_grad_masks
