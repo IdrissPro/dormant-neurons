@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+venv/
+ENV/
+.env
+
+# Hydra
+.multirun/
+outputs/
+
+# Runs / logs / artifacts
+runs/
+out/
+figs/
+videos/
+
+# Editors
+.vscode/
+.idea/
+.DS_Store
+
+# OS / misc
+*.log
+

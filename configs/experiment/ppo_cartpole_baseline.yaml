@@ -1,0 +1,15 @@
+# configs/experiment/ppo_cartpole_baseline.yaml
+defaults:
+  - /base
+  - /algo/ppo
+  - /env/cartpole
+  - /redo/off
+
+seed: 1
+
+instrumentation:
+  enabled: true
+  probe_batch_size: 512
+  metric_every_updates: 200
+  heavy_metric_every_updates: 1000
+

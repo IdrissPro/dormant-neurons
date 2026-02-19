@@ -1,0 +1,29 @@
+[project]
+name = "redo-rl"
+version = "0.1.0"
+description = "Dormant neurons + ReDo mitigation in deep RL (PyTorch)"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Your Name" }]
+dependencies = []
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.black]
+line-length = 110
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 110
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

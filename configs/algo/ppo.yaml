@@ -1,0 +1,30 @@
+# PPO defaults
+algo:
+  name: "ppo"
+
+  # rollout
+  num_steps: 2048
+  update_epochs: 10
+  num_minibatches: 32
+
+  # optimization
+  lr: 3.0e-4
+  anneal_lr: true
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_coef: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: null
+
+  # options
+  norm_adv: true
+  clip_vloss: true
+
+  # network
+  hidden_dims: [64, 64]
+  activation: "tanh"      # PPO common default
+  layernorm: false
+  shared_backbone: false
+

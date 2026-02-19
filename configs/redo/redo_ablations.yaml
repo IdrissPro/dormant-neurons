@@ -1,0 +1,52 @@
+# This file defines multiple named ablation presets that can be selected/overriden from CLI.
+
+redo_ablations:
+  freq_fast:
+    redo:
+      enabled: true
+      mode: "scheduled"
+      redo_every_updates: 1000
+
+  freq_slow:
+    redo:
+      enabled: true
+      mode: "scheduled"
+      redo_every_updates: 20000
+
+  tau_low:
+    redo:
+      enabled: true
+      selection: "activation"
+      tau: 0.01
+
+  tau_high:
+    redo:
+      enabled: true
+      selection: "activation"
+      tau: 0.1
+
+  outgoing_random:
+    redo:
+      enabled: true
+      outgoing: "random"
+
+  incoming_only_like:
+    # Approximate "incoming-only" by keeping outgoing zero (already default) but
+    # you can later extend code to skip outgoing edits; for now keep as doc preset.
+    redo:
+      enabled: true
+      outgoing: "zero"
+
+  gradient_selection:
+    redo:
+      enabled: true
+      selection: "gradient"
+      grad_quantile: 0.10
+
+  conditioned_trigger:
+    redo:
+      enabled: true
+      mode: "conditioned"
+      target_dormant_frac: 0.25
+      patience: 3
+

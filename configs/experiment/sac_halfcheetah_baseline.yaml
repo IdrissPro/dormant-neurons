@@ -1,0 +1,14 @@
+# configs/experiment/sac_halfcheetah_baseline.yaml
+defaults:
+  - /base
+  - /algo/sac
+  - /env/halfcheetah
+  - /redo/off
+
+seed: 1
+
+instrumentation:
+  enabled: true
+  probe_batch_size: 512
+  metric_every_updates: 500
+  heavy_metric_every_updates: 2000

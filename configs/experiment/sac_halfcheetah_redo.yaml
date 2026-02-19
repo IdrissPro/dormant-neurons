@@ -1,0 +1,20 @@
+# configs/experiment/sac_halfcheetah_redo.yaml
+defaults:
+  - /base
+  - /algo/sac
+  - /env/halfcheetah
+  - /redo/redo_default
+
+seed: 1
+
+instrumentation:
+  enabled: true
+  probe_batch_size: 512
+  metric_every_updates: 500
+  heavy_metric_every_updates: 2000
+
+redo:
+  scope: "all"                 # actor + q1 + q2
+  selection: "activation"
+  tau: 0.025
+  redo_every_updates: 5000

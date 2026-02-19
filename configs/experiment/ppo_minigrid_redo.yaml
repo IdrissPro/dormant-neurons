@@ -1,0 +1,20 @@
+# configs/experiment/ppo_minigrid_redo.yaml
+defaults:
+  - /base
+  - /algo/ppo
+  - /env/minigrid
+  - /redo/redo_default
+
+seed: 1
+
+instrumentation:
+  enabled: true
+  probe_batch_size: 512
+  metric_every_updates: 500
+  heavy_metric_every_updates: 2000
+
+redo:
+  # MiniGrid tends to be noisier; use slightly less frequent recycling by default
+  redo_every_updates: 8000
+  selection: "activation"
+  tau: 0.025

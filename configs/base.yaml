@@ -1,0 +1,112 @@
+# configs/base.yaml
+# Global defaults. Specific experiments override env/algo/redo.
+
+seed: 1
+device: "auto"          # "cuda" or "cpu"
+torch_compile: false    # optional: torch.compile for speed (may complicate debugging)
+
+determinism:
+  enabled: false        # if true: sets cudnn deterministic + disables benchmark
+  warn_only: true       # if true: don't crash if some ops are nondeterministic
+
+run:
+  total_env_steps: 1_000_000
+  eval:
+    enabled: false
+    every_env_steps: 100_000
+    episodes: 10
+
+env:
+  id: "CartPole-v1"
+  kwargs: {}
+  num_envs: 8
+  capture_video: false
+  video_dir: "videos"
+
+algo:
+  name: "ppo"           # "ppo" | "sac" | "dqn"
+  # common knobs (per-algo files will use what they need)
+  lr: 3.0e-4
+  gamma: 0.99
+
+instrumentation:
+  enabled: true
+
+  # Probe batch for metrics (drawn from rollout/replay). Keep modest for speed.
+  probe_batch_size: 512
+
+  # How often to compute metrics (in gradient updates, not env steps).
+  metric_every_updates: 1000
+
+  # Heavier metrics are computed less frequently (multiples of metric_every_updates)
+  heavy_metric_every_updates: 5000
+
+  # Dormancy
+  tau: 0.025                  # τ for activation-based dormancy
+  grad_quantile: 0.10         # bottom-q fraction for gradient-based dormancy
+  eps: 1.0e-8
+
+  # Representation metrics toggles
+  repr_metrics:
+    effective_rank: true
+    cosine_diversity: true
+    svd_topk: 32              # store top-k singular values
+    linear_cka: true
+    cka_reference: "ema"      # "first" | "ema"
+    cka_ema_beta: 0.99        # only used if reference is "ema"
+
+redo:
+  enabled: false
+
+  # Trigger logic
+  mode: "scheduled"           # "scheduled" | "conditioned"
+  redo_every_updates: 5000    # scheduled frequency (gradient updates)
+  patience: 3                 # for conditioned mode
+  target_dormant_frac: 0.25   # for conditioned mode
+
+  # Selection
+  selection: "activation"     # "activation" | "gradient"
+  tau: 0.025                  # used if selection=activation
+  grad_quantile: 0.10         # used if selection=gradient
+
+  # What to recycle
+  scope: "shared_trunk"       # "policy_only" | "value_only" | "shared_trunk" | "all"
+  layers: []                  # optional explicit layer names; empty => auto (all Linear in scope)
+
+  # Reinitialization strategy
+  init_mode: "xavier_uniform" # "xavier_uniform" | "orthogonal"
+  reset_bias: true
+  outgoing: "zero"            # "zero" | "random" (paper suggests zero is safest)
+  reset_optimizer_state: true # important for Adam
+
+  # Safety
+  max_recycled_frac_per_layer: 0.5  # cap to avoid catastrophic resets
+
+logging:
+  root_dir: "runs"
+  tb: true
+  jsonl: true
+  stdout: true
+
+  # Optional W&B (off by default)
+  wandb:
+    enabled: false
+    project: "redo-rl"
+    entity: null
+    tags: []
+
+  # Cadence (env steps)
+  log_every_env_steps: 10_000
+
+  # What to store
+  save_checkpoints: false
+  checkpoint_every_env_steps: 200_000
+
+# Hydra runtime settings
+hydra:
+  job:
+    chdir: true
+  run:
+    dir: ${logging.root_dir}/${env.id}/${algo.name}/${now:%Y-%m-%d_%H-%M-%S}_seed${seed}
+  output_subdir: null
+

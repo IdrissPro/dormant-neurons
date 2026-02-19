@@ -1,0 +1,29 @@
+# SAC defaults
+algo:
+  name: "sac"
+
+  # replay + training
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 256
+  train_frequency: 1
+  gradient_steps: 1
+
+  # optimization
+  lr: 3.0e-4
+  gamma: 0.99
+  tau: 0.005
+
+  # entropy / temperature
+  autotune: true
+  alpha: 0.2
+  target_entropy: null
+
+  # actor update cadence
+  policy_delay: 1
+
+  # network
+  hidden_dims: [256, 256]
+  activation: "relu"
+  layernorm: false
+
