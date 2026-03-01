@@ -1,9 +1,10 @@
-# configs/experiment/sac_halfcheetah_baseline.yaml
+# @package _global_
 defaults:
   - /base
-  - /algo/sac
-  - /env/halfcheetah
-  - /redo/off
+  - /algo: sac
+  - /env: halfcheetah
+  - /redo: "off"
+  - _self_
 
 seed: 1
 

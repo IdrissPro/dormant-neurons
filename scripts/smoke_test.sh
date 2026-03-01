@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# scripts/smoke_test.sh
 # Quick sanity checks to ensure training loops run end-to-end.
 
 echo "=== PPO CartPole short run ==="

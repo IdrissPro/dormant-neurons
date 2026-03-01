@@ -436,6 +436,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                                 reset_bias=bool(redo_cfg.reset_bias),
                                 outgoing=str(redo_cfg.outgoing),
                                 max_frac=float(redo_cfg.max_recycled_frac_per_layer),
+                                allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                             )
                             logger.log_scalar("redo/total_recycled", res.total_recycled, step=global_step)
                             for lname, k in res.recycled_by_layer.items():

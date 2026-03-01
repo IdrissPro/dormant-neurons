@@ -1,0 +1,81 @@
+seed: 1
+device: auto
+torch_compile: false
+determinism:
+  enabled: false
+  warn_only: true
+run:
+  total_env_steps: 1000000
+  eval:
+    enabled: false
+    every_env_steps: 100000
+    episodes: 10
+env:
+  id: HalfCheetah-v4
+  kwargs: {}
+  num_envs: 4
+  capture_video: false
+  video_dir: videos
+algo:
+  name: sac
+  lr: 0.0003
+  gamma: 0.99
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 256
+  train_frequency: 1
+  gradient_steps: 1
+  tau: 0.005
+  autotune: true
+  alpha: 0.2
+  target_entropy: null
+  policy_delay: 1
+  hidden_dims:
+  - 256
+  - 256
+  activation: relu
+  layernorm: false
+instrumentation:
+  enabled: true
+  probe_batch_size: 512
+  metric_every_updates: 500
+  heavy_metric_every_updates: 2000
+  tau: 0.025
+  grad_quantile: 0.1
+  eps: 1.0e-08
+  repr_metrics:
+    effective_rank: true
+    cosine_diversity: true
+    svd_topk: 32
+    linear_cka: true
+    cka_reference: ema
+    cka_ema_beta: 0.99
+redo:
+  enabled: true
+  mode: scheduled
+  redo_every_updates: 5000
+  patience: 3
+  target_dormant_frac: 0.25
+  selection: activation
+  tau: 0.025
+  grad_quantile: 0.1
+  scope: all
+  layers: []
+  init_mode: xavier_uniform
+  reset_bias: true
+  outgoing: zero
+  reset_optimizer_state: true
+  max_recycled_frac_per_layer: 0.5
+logging:
+  root_dir: runs
+  tb: true
+  jsonl: true
+  stdout: true
+  wandb:
+    enabled: false
+    project: redo-rl
+    entity: null
+    tags: []
+  log_every_env_steps: 10000
+  save_checkpoints: false
+  checkpoint_every_env_steps: 200000

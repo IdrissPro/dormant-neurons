@@ -1,9 +1,10 @@
-# configs/experiment/dqn_cartpole_baseline.yaml
+# @package _global_
 defaults:
   - /base
-  - /algo/dqn
-  - /env/cartpole
-  - /redo/off
+  - /algo: dqn
+  - /env: cartpole
+  - /redo: "off"
+  - _self_
 
 seed: 1
 

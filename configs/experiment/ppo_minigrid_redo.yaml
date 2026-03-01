@@ -1,9 +1,10 @@
-# configs/experiment/ppo_minigrid_redo.yaml
+# @package _global_
 defaults:
   - /base
-  - /algo/ppo
-  - /env/minigrid
-  - /redo/redo_default
+  - /algo: ppo
+  - /env: minigrid
+  - /redo: redo_default
+  - _self_
 
 seed: 1
 

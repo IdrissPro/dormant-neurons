@@ -608,7 +608,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
             # store
             rb.add(
                 obs=obs_t,
-                action=action if act_kind != "discrete" else action.unsqueeze(-1),  # store as tensor
+                action=action,
                 logprob=logprob,
                 reward=torch.tensor(reward, dtype=torch.float32, device=device),
                 done=torch.tensor(done, dtype=torch.float32, device=device),
@@ -870,6 +870,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                             reset_bias=reset_bias,
                             outgoing=outgoing,
                             max_frac=max_frac,
+                            allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                         )
                         logger.log_scalar("redo/total_recycled", result.total_recycled, step=global_env_step)
                         for lname, k in result.recycled_by_layer.items():
@@ -888,6 +889,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                                 reset_bias=reset_bias,
                                 outgoing=outgoing,
                                 max_frac=max_frac,
+                                allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                             )
                             logger.log_scalar("redo/actor_total_recycled", res_a.total_recycled, step=global_env_step)
 
@@ -900,6 +902,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                                 reset_bias=reset_bias,
                                 outgoing=outgoing,
                                 max_frac=max_frac,
+                                allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                             )
                             logger.log_scalar("redo/critic_total_recycled", res_c.total_recycled, step=global_env_step)
 

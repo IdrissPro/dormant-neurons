@@ -28,3 +28,4 @@ videos/
 # OS / misc
 *.log
 
+.venv_redo

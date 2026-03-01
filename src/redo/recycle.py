@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Set
 
 import torch
 import torch.nn as nn
@@ -149,6 +149,76 @@ def _build_name_to_linear(model: nn.Module) -> Dict[str, nn.Linear]:
     return out
 
 
+# @torch.no_grad()
+# def redo_apply_on_sequential_linears(
+#     model: nn.Module,
+#     dormant_masks: Dict[str, torch.Tensor],
+#     optimizer: Optional[torch.optim.Optimizer] = None,
+#     init_mode: str = "xavier_uniform",
+#     reset_bias: bool = True,
+#     outgoing: str = "zero",
+#     max_frac: float = 0.5,
+# ) -> ReDoResult:
+#     """
+#     Apply ReDo across an MLP-like stack of Linear layers inside 'model'.
+
+#     Assumption: if a Linear named L is followed downstream by another Linear L_next
+#     in the same "scope", we can treat (L, L_next) as a pair for outgoing resets.
+#     In practice, we will:
+#       - sort Linear layer names lexicographically
+#       - apply pairwise for consecutive linears that appear in dormant_masks
+
+#     This is simple and works well for backbones defined as fc0, fc1, fc2...
+#     For more complex topologies, you can provide explicit pairs later.
+
+#     dormant_masks keys must be names of nn.Linear modules in model.
+#     """
+#     name_to_lin = _build_name_to_linear(model)
+#     layer_names = sorted([n for n in dormant_masks.keys() if n in name_to_lin])
+
+#     recycled: Dict[str, int] = {}
+#     total = 0
+
+#     # Pair consecutive linears
+#     for i in range(len(layer_names) - 1):
+#         n_in = layer_names[i]
+#         n_out = layer_names[i + 1]
+#         lin_in = name_to_lin[n_in]
+#         lin_out = name_to_lin[n_out]
+#         mask = dormant_masks[n_in].to(lin_in.weight.device)
+
+#         k = redo_recycle_linear_pair(
+#             lin_in=lin_in,
+#             lin_out=lin_out,
+#             dormant_mask=mask,
+#             optimizer=optimizer,
+#             init_mode=init_mode,
+#             reset_bias=reset_bias,
+#             outgoing=outgoing,
+#             max_frac=max_frac,
+#         )
+#         recycled[n_in] = k
+#         total += k
+
+#     return ReDoResult(recycled_by_layer=recycled, total_recycled=total)
+
+
+def _build_name_to_linear(model: nn.Module) -> Dict[str, nn.Linear]:
+    out: Dict[str, nn.Linear] = {}
+    for name, m in model.named_modules():
+        if isinstance(m, nn.Linear):
+            out[name] = m
+    return out
+
+
+def _normalize_allowlist(allowed_layers: Optional[list[str]]) -> Optional[Set[str]]:
+    if not allowed_layers:
+        return None
+    # Strip whitespace, keep stable exact matching
+    s = {str(x).strip() for x in allowed_layers if str(x).strip()}
+    return s if s else None
+
+
 @torch.no_grad()
 def redo_apply_on_sequential_linears(
     model: nn.Module,
@@ -158,28 +228,35 @@ def redo_apply_on_sequential_linears(
     reset_bias: bool = True,
     outgoing: str = "zero",
     max_frac: float = 0.5,
+    allowed_layers: Optional[list[str]] = None,   # NEW
 ) -> ReDoResult:
     """
     Apply ReDo across an MLP-like stack of Linear layers inside 'model'.
-
-    Assumption: if a Linear named L is followed downstream by another Linear L_next
-    in the same "scope", we can treat (L, L_next) as a pair for outgoing resets.
-    In practice, we will:
-      - sort Linear layer names lexicographically
-      - apply pairwise for consecutive linears that appear in dormant_masks
-
-    This is simple and works well for backbones defined as fc0, fc1, fc2...
-    For more complex topologies, you can provide explicit pairs later.
-
-    dormant_masks keys must be names of nn.Linear modules in model.
+    
+    allowed_layers:
+      - If provided and non-empty, only apply ReDo to those Linear module names.
+      - Names must match nn.Module named_modules() names (e.g., "fcs.0" or "actor_fc0"
+        depending on your backbone implementation).
     """
     name_to_lin = _build_name_to_linear(model)
-    layer_names = sorted([n for n in dormant_masks.keys() if n in name_to_lin])
+
+    allow = _normalize_allowlist(allowed_layers)
+
+    # Only use masks that correspond to actual Linear modules (and pass allowlist if any).
+    usable = []
+    for n in dormant_masks.keys():
+        if n not in name_to_lin:
+            continue
+        if allow is not None and n not in allow:
+            continue
+        usable.append(n)
+
+    layer_names = sorted(usable)
 
     recycled: Dict[str, int] = {}
     total = 0
 
-    # Pair consecutive linears
+    # Pair consecutive linears within the filtered list
     for i in range(len(layer_names) - 1):
         n_in = layer_names[i]
         n_out = layer_names[i + 1]

@@ -1,9 +1,10 @@
-# configs/experiment/dqn_cartpole_redo.yaml
+# @package _global_
 defaults:
   - /base
-  - /algo/dqn
-  - /env/cartpole
-  - /redo/redo_default
+  - /algo: dqn
+  - /env: cartpole
+  - /redo: redo_default
+  - _self_
 
 seed: 1
 

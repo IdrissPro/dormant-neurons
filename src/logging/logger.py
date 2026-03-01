@@ -4,7 +4,6 @@ import io
 import json
 import time
 from typing import Any, Dict, Optional, Union
-
 from omegaconf import DictConfig, OmegaConf
 
 try:

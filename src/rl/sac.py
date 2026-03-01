@@ -276,9 +276,9 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
     actor = SquashedGaussianActor(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm).to(device)
     q1 = CriticQ(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm, name_prefix="q1").to(device)
     q2 = CriticQ(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm, name_prefix="q2").to(device)
-
-    q1_t = CriticQ(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm, name_prefix="q1t").to(device)
-    q2_t = CriticQ(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm, name_prefix="q2t").to(device)
+    # Target critics must have the same parameter names as online critics
+    q1_t = CriticQ(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm, name_prefix="q1").to(device)
+    q2_t = CriticQ(obs_dim, act_dim, sac_cfg.hidden_dims, sac_cfg.activation, sac_cfg.layernorm, name_prefix="q2").to(device)
     q1_t.load_state_dict(q1.state_dict())
     q2_t.load_state_dict(q2.state_dict())
     q1_t.eval()
@@ -650,6 +650,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                                     reset_bias=reset_bias,
                                     outgoing=outgoing,
                                     max_frac=max_frac,
+                                    allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                                 )
                                 logger.log_scalar("redo/actor_total_recycled", res.total_recycled, step=global_step)
                                 total_recycled += res.total_recycled
@@ -664,6 +665,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                                     reset_bias=reset_bias,
                                     outgoing=outgoing,
                                     max_frac=max_frac,
+                                    allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                                 )
                                 logger.log_scalar("redo/q1_total_recycled", res1.total_recycled, step=global_step)
                                 total_recycled += res1.total_recycled
@@ -676,6 +678,7 @@ def train(cfg: DictConfig, envs: gym.vector.VectorEnv, device: torch.device, log
                                     reset_bias=reset_bias,
                                     outgoing=outgoing,
                                     max_frac=max_frac,
+                                    allowed_layers=list(redo_cfg.layers) if getattr(redo_cfg, "layers", None) else None
                                 )
                                 logger.log_scalar("redo/q2_total_recycled", res2.total_recycled, step=global_step)
                                 total_recycled += res2.total_recycled

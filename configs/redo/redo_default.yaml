@@ -1,27 +1,27 @@
-redo:
-  enabled: true
 
-  # Trigger logic
-  mode: "scheduled"            # "scheduled" | "conditioned"
-  redo_every_updates: 5000
+enabled: true
 
-  patience: 3                  # only used if conditioned
-  target_dormant_frac: 0.25    # only used if conditioned
+# Trigger logic
+mode: "scheduled"            # "scheduled" | "conditioned"
+redo_every_updates: 5000
 
-  # Selection of dormant neurons
-  selection: "activation"      # "activation" | "gradient"
-  tau: 0.025
-  grad_quantile: 0.10
+patience: 3                  # only used if conditioned
+target_dormant_frac: 0.25    # only used if conditioned
 
-  # Scope: PPO has actor/critic backbones; SAC has actor + q1/q2; DQN has q backbone
-  scope: "shared_trunk"        # "policy_only" | "value_only" | "shared_trunk" | "all"
-  layers: []                   # optional explicit layer names; empty => use all linears in scope
+# Selection of dormant neurons
+selection: "activation"      # "activation" | "gradient"
+tau: 0.025
+grad_quantile: 0.10
 
-  # Reinitialization strategy
-  init_mode: "xavier_uniform"  # "xavier_uniform" | "orthogonal"
-  reset_bias: true
-  outgoing: "zero"             # "zero" | "random"
-  reset_optimizer_state: true
+# Scope: PPO has actor/critic backbones; SAC has actor + q1/q2; DQN has q backbone
+scope: "shared_trunk"        # "policy_only" | "value_only" | "shared_trunk" | "all"
+layers: []                   # optional explicit layer names; empty => use all linears in scope
 
-  # Safety cap
-  max_recycled_frac_per_layer: 0.5
+# Reinitialization strategy
+init_mode: "xavier_uniform"  # "xavier_uniform" | "orthogonal"
+reset_bias: true
+outgoing: "zero"             # "zero" | "random"
+reset_optimizer_state: true
+
+# Safety cap
+max_recycled_frac_per_layer: 0.5
