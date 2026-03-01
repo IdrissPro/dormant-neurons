@@ -13,3 +13,7 @@ instrumentation:
   probe_batch_size: 512
   metric_every_updates: 500
   heavy_metric_every_updates: 2000
+
+#Added
+run:
+  total_env_steps: 200000

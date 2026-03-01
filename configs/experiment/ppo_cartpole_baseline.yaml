@@ -14,3 +14,6 @@ instrumentation:
   metric_every_updates: 200
   heavy_metric_every_updates: 1000
 
+#Added
+run:
+  total_env_steps: 200000

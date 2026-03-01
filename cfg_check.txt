@@ -5,36 +5,39 @@ determinism:
   enabled: false
   warn_only: true
 run:
-  total_env_steps: 1000000
+  total_env_steps: 200000
   eval:
     enabled: false
     every_env_steps: 100000
     episodes: 10
 env:
-  id: HalfCheetah-v4
+  id: MiniGrid-Empty-8x8-v0
   kwargs: {}
-  num_envs: 4
+  num_envs: 16
   capture_video: false
   video_dir: videos
 algo:
-  name: sac
+  name: ppo
   lr: 0.0003
   gamma: 0.99
-  buffer_size: 1000000
-  learning_starts: 10000
-  batch_size: 256
-  train_frequency: 1
-  gradient_steps: 1
-  tau: 0.005
-  autotune: true
-  alpha: 0.2
-  target_entropy: null
-  policy_delay: 1
+  num_steps: 2048
+  update_epochs: 10
+  num_minibatches: 32
+  anneal_lr: true
+  gae_lambda: 0.95
+  clip_coef: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: null
+  norm_adv: true
+  clip_vloss: true
   hidden_dims:
-  - 256
-  - 256
-  activation: relu
+  - 64
+  - 64
+  activation: tanh
   layernorm: false
+  shared_backbone: false
 instrumentation:
   enabled: true
   probe_batch_size: 512
@@ -53,13 +56,13 @@ instrumentation:
 redo:
   enabled: true
   mode: scheduled
-  redo_every_updates: 5000
+  redo_every_updates: 8000
   patience: 3
   target_dormant_frac: 0.25
   selection: activation
   tau: 0.025
   grad_quantile: 0.1
-  scope: all
+  scope: shared_trunk
   layers: []
   init_mode: xavier_uniform
   reset_bias: true

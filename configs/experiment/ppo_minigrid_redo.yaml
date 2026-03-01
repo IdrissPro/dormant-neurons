@@ -19,3 +19,7 @@ redo:
   redo_every_updates: 8000
   selection: "activation"
   tau: 0.025
+
+#Added
+run:
+  total_env_steps: 200000

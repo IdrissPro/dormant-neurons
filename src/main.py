@@ -14,6 +14,12 @@ import torch
 import gymnasium as gym
 from gymnasium.vector import SyncVectorEnv
 
+try:
+    import minigrid
+    from minigrid.wrappers import FlatObsWrapper
+except ImportError:
+    pass
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
@@ -59,6 +65,10 @@ def make_env_thunk(
 ) -> Callable[[], gym.Env]:
     def thunk() -> gym.Env:
         env = gym.make(env_id, **(env_kwargs or {}))
+
+        if str(env_id).startswith("MiniGrid-"):
+            env = FlatObsWrapper(env)
+
         env = gym.wrappers.RecordEpisodeStatistics(env)
 
         # Seed handling: Gymnasium recommends seeding reset().
